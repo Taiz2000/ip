@@ -1,10 +1,12 @@
-# Duke User Guide
+# Sagiri User Guide
 
 // Update the title above to match the actual product name
 
-// Product screenshot goes here
+// Product screenshot goes here //TODO
 
 // Product intro goes here
+
+
 
 ## Adding deadlines
 
