@@ -51,6 +51,20 @@ public class Sagiri {
                     } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
                         throw new SagiriException("Nope that's not a valid task number");
                     }
+                } else if (input.startsWith("delete")) {
+                    try {
+                        int taskNumber = Integer.parseInt(input.split(" ")[1]) - 1;
+                        if (taskNumber < 0 || taskNumber >= tasks.size()) {
+                            throw new SagiriException("Can't find " + (taskNumber + 1));
+                        }
+                        Task removedTask = tasks.remove(taskNumber);
+                        System.out.println(bar);
+                        System.out.println("Noted. I've removed this task:");
+                        System.out.println(removedTask.toString());
+                        System.out.println(bar);
+                    } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+                        throw new SagiriException("Nope that's not a valid task number");
+                    }
                 } else {
                     System.out.println(bar);
                     if (input.startsWith("todo")) {
@@ -94,7 +108,7 @@ public class Sagiri {
                         System.out.println("Got it. I've added this task:");
                         System.out.println("  " + tasks.get(tasks.size() - 1).toString());
                     } else {
-                        String msg = "No clue what that means :((\nYou can use todo, event, deadline, mark, unmark, list, or bye";
+                        String msg = "No clue what that means :((\nYou can use todo, event, deadline, mark, unmark, delete, list, or bye";
                         throw new SagiriException(msg);
                     }
                     System.out.println("Now you have " + tasks.size() + " tasks in the list.");
