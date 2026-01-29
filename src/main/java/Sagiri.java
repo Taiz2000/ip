@@ -38,8 +38,33 @@ public class Sagiri {
                 System.out.println(bar);
             } else {
                 System.out.println(bar);
-                System.out.println("added: " + input);
-                tasks.add(new Task(input));
+                if (input.startsWith("todo")) {
+                    String taskName = input.substring(5).trim();
+                    tasks.add(new Task(taskName));
+                    System.out.println("Got it. I've added this task:");
+                    System.out.println("  " + tasks.get(tasks.size() - 1).toString());
+                } else if (input.startsWith("event")) {
+                    String desc = input.substring(6).trim();
+                    int fromIndex = desc.indexOf(" /from ");
+                    int toIndex = desc.indexOf(" /to ");
+                    // extract name, start and end date/time
+                    String taskName = desc.substring(0, fromIndex).trim();
+                    String start = desc.substring(fromIndex + 7, toIndex).trim();
+                    String end = desc.substring(toIndex + 5).trim();
+                    tasks.add(new Task(taskName, start, end));
+                    System.out.println("Got it. I've added this task:");
+                    System.out.println("  " + tasks.get(tasks.size() - 1).toString());
+                } else if (input.startsWith("deadline")) {
+                    String desc = input.substring(9).trim();
+                    int byIndex = desc.indexOf(" /by ");
+                    // extract name and end date/time
+                    String taskName = desc.substring(0, byIndex).trim();
+                    String end = desc.substring(byIndex + 5).trim();
+                    tasks.add(new Task(taskName, end));
+                    System.out.println("Got it. I've added this task:");
+                    System.out.println("  " + tasks.get(tasks.size() - 1).toString());
+                }
+                System.out.println("Now you have " + tasks.size() + " tasks in the list.");
                 System.out.println(bar);
             }
             input = scanner.nextLine();
