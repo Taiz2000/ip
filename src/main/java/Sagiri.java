@@ -1,10 +1,10 @@
 import java.util.Scanner;
+import java.util.ArrayList;
 
 public class Sagiri {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        String[][] tasks = new String[100][2];
-        int index = 0;
+        ArrayList<Task> tasks = new ArrayList<>();
 
         String name = "Sagiri";
         String bar = "____________________________________________________________";
@@ -18,31 +18,28 @@ public class Sagiri {
         while (!input.equals("bye")) {
             if (input.equals("list")) {
                 System.out.println(bar);
-                for (int i = 0; i < index; i++) {
-                    System.out.println((i+1) + ".[" + tasks[i][0] + "] " + tasks[i][1]);
-
+                for (int i = 0; i < tasks.size(); i++) {
+                    System.out.println((i+1) + "." + tasks.get(i).toString());
                 }
                 System.out.println(bar);
             } else if (input.startsWith("mark")) {
                 int taskNumber = Integer.parseInt(input.split(" ")[1]) - 1;
-                tasks[taskNumber][0] = "X";
+                tasks.get(taskNumber).markAsDone();
                 System.out.println(bar);
                 System.out.println("Nice! I've marked this task as done:");
-                System.out.println("[" + tasks[taskNumber][0] + "] " + tasks[taskNumber][1]);
+                System.out.println(tasks.get(taskNumber).toString());
                 System.out.println(bar);
             } else if (input.startsWith("unmark")) {
                 int taskNumber = Integer.parseInt(input.split(" ")[1]) - 1;
-                tasks[taskNumber][0] = " ";
+                tasks.get(taskNumber).markAsNotDone();
                 System.out.println(bar);
                 System.out.println("OK, I've marked this task as not done yet:");
-                System.out.println("[" + tasks[taskNumber][0] + "] " + tasks[taskNumber][1]);
+                System.out.println(tasks.get(taskNumber).toString());
                 System.out.println(bar);
             } else {
                 System.out.println(bar);
                 System.out.println("added: " + input);
-                tasks[index][1] = input; // add to array
-                tasks[index][0] = " "; // default status
-                index++;
+                tasks.add(new Task(input));
                 System.out.println(bar);
             }
             input = scanner.nextLine();
