@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class Sagiri {
     private static final String BAR = "____________________________________________________________";
@@ -106,9 +108,11 @@ public class Sagiri {
                 
                 String time = "";
                 if (task.getType() == TaskType.EVENT) {
-                    time = task.getStartDate() + " | " + task.getEndDate();
+                    String start = formatDateForStorage(task.getStartDateTime());
+                    String end = formatDateForStorage(task.getEndDateTime());
+                    time = start + " | " + end;
                 } else if (task.getType() == TaskType.DEADLINE) {
-                    time = task.getEndDate();
+                    time = formatDateForStorage(task.getEndDateTime());
                 }
                 
                 fw.write(type + " | " + marked + " | " + name + " | " + time + "\n");
@@ -117,6 +121,18 @@ public class Sagiri {
         } catch (IOException e) {
             System.out.println("Error saving tasks: " + e.getMessage());
         }
+    }
+
+    /**
+     * Formats a LocalDateTime to "dd-mm-yy" format for storage.
+     * @param dateTime the LocalDateTime to format
+     * @return formatted date string or empty string if dateTime is null
+     */
+    private static String formatDateForStorage(LocalDateTime dateTime) {
+        if (dateTime == null) {
+            return "";
+        }
+        return dateTime.format(DateTimeFormatter.ofPattern("dd-MM-yy"));
     }
 
     /**
@@ -212,6 +228,15 @@ public class Sagiri {
         if (taskName.isEmpty() || start.isEmpty() || end.isEmpty()) {
             throw new SagiriException("Event name, start time, and end time cannot be empty.");
         }
+        
+        // Validate date formats
+        if (!isValidDateFormat(start)) {
+            throw new SagiriException("Invalid start date format. Please use dd-mm-yy format (e.g., 25-12-24)");
+        }
+        if (!isValidDateFormat(end)) {
+            throw new SagiriException("Invalid end date format. Please use dd-mm-yy format (e.g., 25-12-24)");
+        }
+        
         tasks.add(new Task(taskName, start, end));
         System.out.println("Got it. I've added this task:");
         System.out.println("  " + tasks.get(tasks.size() - 1).toString());
@@ -233,6 +258,12 @@ public class Sagiri {
         if (taskName.isEmpty() || end.isEmpty()) {
             throw new SagiriException("Deadline name and date cannot be empty.");
         }
+        
+        // Validate date format
+        if (!isValidDateFormat(end)) {
+            throw new SagiriException("Invalid deadline date format. Please use dd-mm-yy format (e.g., 25-12-24)");
+        }
+        
         tasks.add(new Task(taskName, end));
         System.out.println("Got it. I've added this task:");
         System.out.println("  " + tasks.get(tasks.size() - 1).toString());
@@ -288,6 +319,34 @@ public class Sagiri {
                 String msg = "No clue what that means :((\nYou can use todo, event, deadline, mark, unmark, delete, list, or bye";
                 throw new SagiriException(msg);
             }
+        }
+    }
+    
+    /**
+     * Validates if a date string is in "dd-mm-yy" format.
+     * @param dateStr the date string to validate
+     * @return true if valid, false otherwise
+     */
+    private static boolean isValidDateFormat(String dateStr) {
+        if (dateStr == null || dateStr.length() != 8) {
+            return false;
+        }
+        try {
+            String[] parts = dateStr.split("-");
+            if (parts.length != 3) {
+                return false;
+            }
+            int day = Integer.parseInt(parts[0]);
+            int month = Integer.parseInt(parts[1]);
+            int year = Integer.parseInt(parts[2]);
+            
+            // Basic validation
+            if (day < 1 || day > 31 || month < 1 || month > 12 || year < 0 || year > 99) {
+                return false;
+            }
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
         }
     }
 
