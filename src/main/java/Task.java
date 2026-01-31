@@ -81,6 +81,38 @@ public class Task {
     }
 
     /**
+     * Gets the start date of the task.
+     * @return start date or null
+     */
+    public String getStartDate() {
+        return this.startDate;
+    }
+
+    /**
+     * Gets the end date of the task.
+     * @return end date or null
+     */
+    public String getEndDate() {
+        return this.endDate;
+    }
+
+    /**
+     * Checks if the task is done.
+     * @return true if done, false otherwise
+     */
+    public boolean isDone() {
+        return this.isDone;
+    }
+
+    /**
+     * Gets the task type.
+     * @return the task type
+     */
+    public TaskType getType() {
+        return this.type;
+    }
+
+    /**
      * Marks the task as done.
      */
     public void markAsDone() {
