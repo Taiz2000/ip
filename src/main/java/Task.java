@@ -1,9 +1,12 @@
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 public class Task {
     private String name;
     private boolean isDone;
     private TaskType type;
-    private String startDate;
-    private String endDate;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
     
     /**
      * Constructor for Task (ToDo).
@@ -20,7 +23,7 @@ public class Task {
      * @param endDate
      */
     public Task(String name, String startDate, String endDate) {
-        this(name, TaskType.EVENT, startDate, endDate);
+        this(name, TaskType.EVENT, parseDate(startDate), parseDate(endDate));
     }
 
     /**
@@ -29,7 +32,7 @@ public class Task {
      * @param endDate
      */
     public Task(String name, String endDate) {
-        this(name, TaskType.DEADLINE, null, endDate);
+        this(name, TaskType.DEADLINE, null, parseDate(endDate));
     }
 
     /**
@@ -39,12 +42,37 @@ public class Task {
      * @param startDate
      * @param endDate
      */
-    private Task(String name, TaskType type, String startDate, String endDate) {
+    private Task(String name, TaskType type, LocalDateTime startDate, LocalDateTime endDate) {
         this.name = name;
         this.type = type;
         this.startDate = startDate;
         this.endDate = endDate;
         this.isDone = false;
+    }
+
+    /**
+     * Parses a date string in "dd-mm-yy" format to LocalDateTime.
+     * @param dateStr the date string to parse
+     * @return LocalDateTime object, or null if parsing fails
+     */
+    private static LocalDateTime parseDate(String dateStr) {
+        if (dateStr == null || dateStr.trim().isEmpty()) {
+            return null;
+        }
+        try {
+            // Parse dd-mm-yy format
+            String[] parts = dateStr.split("-");
+            if (parts.length != 3) {
+                return null;
+            }
+            int day = Integer.parseInt(parts[0]);
+            int month = Integer.parseInt(parts[1]);
+            int year = Integer.parseInt(parts[2]) + 2000; // yy -> 20yy
+            
+            return LocalDateTime.of(year, month, day, 0, 0);
+        } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+            return null;
+        }
     }
 
     /**
@@ -85,7 +113,7 @@ public class Task {
      * @return start date or null
      */
     public String getStartDate() {
-        return this.startDate;
+        return formatDate(startDate);
     }
 
     /**
@@ -93,7 +121,35 @@ public class Task {
      * @return end date or null
      */
     public String getEndDate() {
-        return this.endDate;
+        return formatDate(endDate);
+    }
+
+    /**
+     * Gets the start date as LocalDateTime.
+     * @return start date or null
+     */
+    public LocalDateTime getStartDateTime() {
+        return startDate;
+    }
+
+    /**
+     * Gets the end date as LocalDateTime.
+     * @return end date or null
+     */
+    public LocalDateTime getEndDateTime() {
+        return endDate;
+    }
+
+    /**
+     * Formats a LocalDateTime to "dd MMM yyyy" format.
+     * @param dateTime the LocalDateTime to format
+     * @return formatted date string or null if dateTime is null
+     */
+    private static String formatDate(LocalDateTime dateTime) {
+        if (dateTime == null) {
+            return null;
+        }
+        return dateTime.format(DateTimeFormatter.ofPattern("dd MMM yyyy"));
     }
 
     /**
@@ -130,9 +186,9 @@ public class Task {
     public String toString() {
         String result = "[" + getTypeIcon() + "][" + getStatusIcon() + "] " + getName();
         if (type == TaskType.EVENT) {
-            result += " (from: " + startDate + " to: " + endDate + ")";
+            result += " (from: " + getStartDate() + " to: " + getEndDate() + ")";
         } else if (type == TaskType.DEADLINE) {
-            result += " (by: " + endDate + ")";
+            result += " (by: " + getEndDate() + ")";
         }
         return result;
     }

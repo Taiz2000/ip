@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class Sagiri {
     private static final String BAR = "____________________________________________________________";
@@ -106,9 +108,11 @@ public class Sagiri {
                 
                 String time = "";
                 if (task.getType() == TaskType.EVENT) {
-                    time = task.getStartDate() + " | " + task.getEndDate();
+                    String start = formatDateForStorage(task.getStartDateTime());
+                    String end = formatDateForStorage(task.getEndDateTime());
+                    time = start + " | " + end;
                 } else if (task.getType() == TaskType.DEADLINE) {
-                    time = task.getEndDate();
+                    time = formatDateForStorage(task.getEndDateTime());
                 }
                 
                 fw.write(type + " | " + marked + " | " + name + " | " + time + "\n");
@@ -117,6 +121,18 @@ public class Sagiri {
         } catch (IOException e) {
             System.out.println("Error saving tasks: " + e.getMessage());
         }
+    }
+
+    /**
+     * Formats a LocalDateTime to "dd-mm-yy" format for storage.
+     * @param dateTime the LocalDateTime to format
+     * @return formatted date string or empty string if dateTime is null
+     */
+    private static String formatDateForStorage(LocalDateTime dateTime) {
+        if (dateTime == null) {
+            return "";
+        }
+        return dateTime.format(DateTimeFormatter.ofPattern("dd-MM-yy"));
     }
 
     /**
@@ -212,6 +228,15 @@ public class Sagiri {
         if (taskName.isEmpty() || start.isEmpty() || end.isEmpty()) {
             throw new SagiriException("Event name, start time, and end time cannot be empty.");
         }
+        
+        // Validate date formats
+        if (!isValidDateFormat(start)) {
+            throw new SagiriException("Invalid start date format. Please use dd-mm-yy format (e.g., 25-12-24)");
+        }
+        if (!isValidDateFormat(end)) {
+            throw new SagiriException("Invalid end date format. Please use dd-mm-yy format (e.g., 25-12-24)");
+        }
+        
         tasks.add(new Task(taskName, start, end));
         System.out.println("Got it. I've added this task:");
         System.out.println("  " + tasks.get(tasks.size() - 1).toString());
@@ -233,6 +258,12 @@ public class Sagiri {
         if (taskName.isEmpty() || end.isEmpty()) {
             throw new SagiriException("Deadline name and date cannot be empty.");
         }
+        
+        // Validate date format
+        if (!isValidDateFormat(end)) {
+            throw new SagiriException("Invalid deadline date format. Please use dd-mm-yy format (e.g., 25-12-24)");
+        }
+        
         tasks.add(new Task(taskName, end));
         System.out.println("Got it. I've added this task:");
         System.out.println("  " + tasks.get(tasks.size() - 1).toString());
@@ -270,6 +301,16 @@ public class Sagiri {
             } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
                 throw new SagiriException("Nope that's not a valid task number");
             }
+        } else if (input.startsWith("check")) {
+            try {
+                String dateStr = input.substring(6).trim();
+                if (!isValidDateFormat(dateStr)) {
+                    throw new SagiriException("Invalid date format. Please use dd-mm-yy format (e.g., 25-12-24)");
+                }
+                checkTasksForDate(tasks, dateStr);
+            } catch (StringIndexOutOfBoundsException e) {
+                throw new SagiriException("Invalid check command. Please use: check dd-mm-yy");
+            }
         } else {
             System.out.println(BAR);
             if (input.startsWith("todo")) {
@@ -285,9 +326,141 @@ public class Sagiri {
                 addDeadline(tasks, desc);
                 saveTasks(tasks);
             } else {
-                String msg = "No clue what that means :((\nYou can use todo, event, deadline, mark, unmark, delete, list, or bye";
+                String msg = "No clue what that means :((\nYou can use todo, event, deadline, mark, unmark, delete, list, check, or bye";
                 throw new SagiriException(msg);
             }
+        }
+    }
+
+    /**
+     * Parses a date string in "dd-mm-yy" format to LocalDateTime.
+     * @param dateStr the date string to parse
+     * @return LocalDateTime object, or null if parsing fails
+     */
+    private static LocalDateTime parseDate(String dateStr) {
+        if (dateStr == null || dateStr.trim().isEmpty()) {
+            return null;
+        }
+        try {
+            // Parse dd-mm-yy format
+            String[] parts = dateStr.split("-");
+            if (parts.length != 3) {
+                return null;
+            }
+            int day = Integer.parseInt(parts[0]);
+            int month = Integer.parseInt(parts[1]);
+            int year = Integer.parseInt(parts[2]) + 2000; // yy -> 20yy
+            
+            return LocalDateTime.of(year, month, day, 0, 0);
+        } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+            return null;
+        }
+    }
+
+    /**
+     * Checks and displays tasks (deadlines and events) for a specific date.
+     * @param tasks the list of tasks to check
+     * @param dateStr the date string in "dd-mm-yy" format
+     */
+    private static void checkTasksForDate(ArrayList<Task> tasks, String dateStr) {
+        // Parse the target date
+        LocalDateTime targetDate = parseDateForComparison(dateStr);
+        
+        System.out.println(BAR);
+        System.out.println("Tasks for " + formatDateForDisplay(targetDate) + ":");
+        
+        boolean foundTasks = false;
+        for (int i = 0; i < tasks.size(); i++) {
+            Task task = tasks.get(i);
+            boolean matches = false;
+            
+            if (task.getType() == TaskType.EVENT) {
+                // Check if event starts or ends on the target date
+                LocalDateTime startDate = task.getStartDateTime();
+                LocalDateTime endDate = task.getEndDateTime();
+                if ((startDate != null && datesEqual(startDate, targetDate)) ||
+                    (endDate != null && datesEqual(endDate, targetDate))) {
+                    matches = true;
+                }
+            } else if (task.getType() == TaskType.DEADLINE) {
+                // Check if deadline is on the target date
+                LocalDateTime deadlineDate = task.getEndDateTime();
+                if (deadlineDate != null && datesEqual(deadlineDate, targetDate)) {
+                    matches = true;
+                }
+            }
+            
+            if (matches) {
+                System.out.println((i + 1) + "." + task.toString());
+                foundTasks = true;
+            }
+        }
+        
+        if (!foundTasks) {
+            System.out.println("No tasks found for this date.");
+        }
+        System.out.println(BAR);
+    }
+    
+    /**
+     * Parses a date string for comparison purposes.
+     * @param dateStr the date string in "dd-mm-yy" format
+     * @return LocalDateTime object for comparison
+     */
+    private static LocalDateTime parseDateForComparison(String dateStr) {
+        return parseDate(dateStr);
+    }
+    
+    /**
+     * Formats a LocalDateTime for display in the check command.
+     * @param dateTime the LocalDateTime to format
+     * @return formatted date string
+     */
+    private static String formatDateForDisplay(LocalDateTime dateTime) {
+        if (dateTime == null) {
+            return "Unknown";
+        }
+        return dateTime.format(DateTimeFormatter.ofPattern("dd MMM yyyy"));
+    }
+    
+    /**
+     * Compares two LocalDateTime objects for date equality (ignores time).
+     * @param date1 first date
+     * @param date2 second date
+     * @return true if dates are equal, false otherwise
+     */
+    private static boolean datesEqual(LocalDateTime date1, LocalDateTime date2) {
+        if (date1 == null || date2 == null) {
+            return false;
+        }
+        return date1.toLocalDate().equals(date2.toLocalDate());
+    }
+
+    /**
+     * Validates if a date string is in "dd-mm-yy" format.
+     * @param dateStr the date string to validate
+     * @return true if valid, false otherwise
+     */
+    private static boolean isValidDateFormat(String dateStr) {
+        if (dateStr == null || dateStr.length() != 8) {
+            return false;
+        }
+        try {
+            String[] parts = dateStr.split("-");
+            if (parts.length != 3) {
+                return false;
+            }
+            int day = Integer.parseInt(parts[0]);
+            int month = Integer.parseInt(parts[1]);
+            int year = Integer.parseInt(parts[2]);
+            
+            // Basic validation
+            if (day < 1 || day > 31 || month < 1 || month > 12 || year < 0 || year > 99) {
+                return false;
+            }
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
         }
     }
 
