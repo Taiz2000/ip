@@ -1,21 +1,90 @@
 import java.util.Scanner;
 import java.util.ArrayList;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
 
 public class Sagiri {
     private static final String BAR = "____________________________________________________________";
 
     /**
-     * Loads tasks from disk. Placeholder for future implementation.
+     * Loads tasks from disk. Reads from ./data/Sagiri.dat in format: type | marked | name | time
      */
     private static void loadTasks(ArrayList<Task> tasks) {
-        // nothing here yet
+        try {
+            File file = new File("./data/Sagiri.dat");
+            if (!file.exists()) {
+                return; // No file to load, start with empty list
+            }
+            
+            List<String> lines = Files.readAllLines(Paths.get("./data/Sagiri.dat"));
+            for (String line : lines) {
+                if (line.trim().isEmpty()) continue;
+                
+                String[] parts = line.split(" \\| ");
+                if (parts.length < 4) continue;
+                
+                String type = parts[0].trim();
+                String marked = parts[1].trim();
+                String name = parts[2].trim();
+                String time = parts[3].trim();
+                
+                Task task = null;
+                if (type.equals("T")) {
+                    task = new Task(name);
+                } else if (type.equals("E")) {
+                    String[] timeParts = time.split(" \\| ");
+                    if (timeParts.length >= 2) {
+                        String start = timeParts[0].trim();
+                        String end = timeParts[1].trim();
+                        task = new Task(name, start, end);
+                    }
+                } else if (type.equals("D")) {
+                    task = new Task(name, time);
+                }
+                
+                if (task != null) {
+                    if (marked.equals("1")) {
+                        task.markAsDone();
+                    }
+                    tasks.add(task);
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error loading tasks: " + e.getMessage());
+        }
     }
 
     /**
-     * Saves tasks to disk. Placeholder for future implementation.
+     * Saves tasks to disk. Saves to ./data/Sagiri.dat in format: type | marked | name | time
      */
     private static void saveTasks(ArrayList<Task> tasks) {
-        // nothing here yet
+        try {
+            // Create data directory if it doesn't exist
+            Files.createDirectories(Paths.get("./data"));
+            
+            FileWriter fw = new FileWriter("./data/Sagiri.dat");
+            for (Task task : tasks) {
+                String type = task.getTypeIcon();
+                String marked = task.isDone() ? "1" : "0";
+                String name = task.getName();
+                
+                String time = "";
+                if (task.getType() == TaskType.EVENT) {
+                    time = task.getStartDate() + " | " + task.getEndDate();
+                } else if (task.getType() == TaskType.DEADLINE) {
+                    time = task.getEndDate();
+                }
+                
+                fw.write(type + " | " + marked + " | " + name + " | " + time + "\n");
+            }
+            fw.close();
+        } catch (IOException e) {
+            System.out.println("Error saving tasks: " + e.getMessage());
+        }
     }
 
     /**
