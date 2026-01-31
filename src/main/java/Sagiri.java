@@ -12,8 +12,9 @@ public class Sagiri {
 
     /**
      * Loads tasks from disk. Reads from ./data/Sagiri.dat in format: type | marked | name | time
+     * Throws SagiriException if the file format is corrupted.
      */
-    private static void loadTasks(ArrayList<Task> tasks) {
+    private static void loadTasks(ArrayList<Task> tasks) throws SagiriException {
         try {
             File file = new File("./data/Sagiri.dat");
             if (!file.exists()) {
@@ -21,28 +22,59 @@ public class Sagiri {
             }
             
             List<String> lines = Files.readAllLines(Paths.get("./data/Sagiri.dat"));
-            for (String line : lines) {
+            for (int lineNum = 1; lineNum <= lines.size(); lineNum++) {
+                String line = lines.get(lineNum - 1);
                 if (line.trim().isEmpty()) continue;
                 
                 String[] parts = line.split(" \\| ");
-                if (parts.length < 4) continue;
+                if (parts.length != 4) {
+                    throw new SagiriException("Corrupted data file at line " + lineNum + ": Expected 4 parts separated by ' | ', found " + parts.length);
+                }
                 
                 String type = parts[0].trim();
                 String marked = parts[1].trim();
                 String name = parts[2].trim();
                 String time = parts[3].trim();
                 
+                // Validate type
+                if (!type.equals("T") && !type.equals("E") && !type.equals("D")) {
+                    throw new SagiriException("Corrupted data file at line " + lineNum + ": Invalid task type '" + type + "'. Expected T, E, or D");
+                }
+                
+                // Validate marked status
+                if (!marked.equals("0") && !marked.equals("1")) {
+                    throw new SagiriException("Corrupted data file at line " + lineNum + ": Invalid marked status '" + marked + "'. Expected 0 or 1");
+                }
+                
+                // Validate name
+                if (name.isEmpty()) {
+                    throw new SagiriException("Corrupted data file at line " + lineNum + ": Task name cannot be empty");
+                }
+                
                 Task task = null;
                 if (type.equals("T")) {
+                    // Todo tasks should have empty time field
+                    if (!time.isEmpty()) {
+                        throw new SagiriException("Corrupted data file at line " + lineNum + ": Todo task should have empty time field, found '" + time + "'");
+                    }
                     task = new Task(name);
                 } else if (type.equals("E")) {
+                    // Event tasks should have "start | end" format
                     String[] timeParts = time.split(" \\| ");
-                    if (timeParts.length >= 2) {
-                        String start = timeParts[0].trim();
-                        String end = timeParts[1].trim();
-                        task = new Task(name, start, end);
+                    if (timeParts.length != 2) {
+                        throw new SagiriException("Corrupted data file at line " + lineNum + ": Event task time should be in 'start | end' format, found '" + time + "'");
                     }
+                    String start = timeParts[0].trim();
+                    String end = timeParts[1].trim();
+                    if (start.isEmpty() || end.isEmpty()) {
+                        throw new SagiriException("Corrupted data file at line " + lineNum + ": Event start and end times cannot be empty");
+                    }
+                    task = new Task(name, start, end);
                 } else if (type.equals("D")) {
+                    // Deadline tasks should have single time value
+                    if (time.isEmpty()) {
+                        throw new SagiriException("Corrupted data file at line " + lineNum + ": Deadline task must have a deadline time");
+                    }
                     task = new Task(name, time);
                 }
                 
@@ -54,7 +86,7 @@ public class Sagiri {
                 }
             }
         } catch (IOException e) {
-            System.out.println("Error loading tasks: " + e.getMessage());
+            throw new SagiriException("Error reading data file: " + e.getMessage());
         }
     }
 
@@ -263,7 +295,14 @@ public class Sagiri {
         Scanner scanner = new Scanner(System.in);
         ArrayList<Task> tasks = new ArrayList<>();
 
-        loadTasks(tasks);
+        try {
+            loadTasks(tasks);
+        } catch (SagiriException e) {
+            System.out.println(BAR);
+            System.out.println("Error loading saved tasks: " + e.getMessage());
+            System.out.println("Starting with empty task list.");
+            System.out.println(BAR);
+        }
         showGreeting();
 
         String input = scanner.nextLine();
