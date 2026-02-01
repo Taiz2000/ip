@@ -10,7 +10,7 @@ import java.time.format.DateTimeFormatter;
 public class Storage {
 
     /**
-     * Loads tasks from disk into the task list. Reads from ./data/Sagiri.dat in format: type | marked | name | time
+     * Loads tasks from disk into the task list. Reads from ./data/Sagiri.dat in format: type | marked | name | start | end
      * Throws SagiriException if the file format is corrupted.
      */
     public static void loadTasks(TaskList taskList) throws SagiriException {
@@ -26,14 +26,24 @@ public class Storage {
                 if (line.trim().isEmpty()) continue;
 
                 String[] parts = line.split(" \\| ");
-                if (parts.length != 4) {
-                    throw new SagiriException("Corrupted data file at line " + lineNum + ": Expected 4 parts separated by ' | ', found " + parts.length);
+                if (parts.length != 5) {
+                    throw new SagiriException("Corrupted data file at line " + lineNum + ": Expected 5 parts separated by ' | ', found " + parts.length);
                 }
 
                 String type = parts[0].trim();
                 String marked = parts[1].trim();
                 String name = parts[2].trim();
-                String time = parts[3].trim();
+                String start = parts[3].trim();
+                String end = parts[4].trim();
+
+                // Handle null placeholders
+                if (start.equals("null")) {
+                    start = "";
+                }
+                
+                if (end.equals("null")) {
+                    end = "";
+                }
 
                 // Validate type
                 if (!type.equals("T") && !type.equals("E") && !type.equals("D")) {
@@ -52,29 +62,23 @@ public class Storage {
 
                 Task task = null;
                 if (type.equals("T")) {
-                    // Todo tasks should have empty time field
-                    if (!time.isEmpty()) {
-                        throw new SagiriException("Corrupted data file at line " + lineNum + ": Todo task should have empty time field, found '" + time + "'");
+                    // Todo tasks should have empty start and end
+                    if (!start.isEmpty() || !end.isEmpty()) {
+                        throw new SagiriException("Corrupted data file at line " + lineNum + ": Todo task should have empty start and end fields, found start='" + start + "', end='" + end + "'");
                     }
                     task = new Task(name);
                 } else if (type.equals("E")) {
-                    // Event tasks should have "start | end" format
-                    String[] timeParts = time.split(" \\| ");
-                    if (timeParts.length != 2) {
-                        throw new SagiriException("Corrupted data file at line " + lineNum + ": Event task time should be in 'start | end' format, found '" + time + "'");
-                    }
-                    String start = timeParts[0].trim();
-                    String end = timeParts[1].trim();
+                    // Event tasks should have both start and end
                     if (start.isEmpty() || end.isEmpty()) {
-                        throw new SagiriException("Corrupted data file at line " + lineNum + ": Event start and end times cannot be empty");
+                        throw new SagiriException("Corrupted data file at line " + lineNum + ": Event task must have both start and end times, found start='" + start + "', end='" + end + "'");
                     }
                     task = new Task(name, start, end);
                 } else if (type.equals("D")) {
-                    // Deadline tasks should have single time value
-                    if (time.isEmpty()) {
-                        throw new SagiriException("Corrupted data file at line " + lineNum + ": Deadline task must have a deadline time");
+                    // Deadline tasks should have empty start and non-empty end
+                    if (!start.isEmpty() || end.isEmpty()) {
+                        throw new SagiriException("Corrupted data file at line " + lineNum + ": Deadline task should have empty start and non-empty end, found start='" + start + "', end='" + end + "'");
                     }
-                    task = new Task(name, time);
+                    task = new Task(name, end);
                 }
 
                 if (task != null) {
@@ -90,7 +94,7 @@ public class Storage {
     }
 
     /**
-     * Saves tasks to disk. Saves to ./data/Sagiri.dat in format: type | marked | name | time
+     * Saves tasks to disk. Saves to ./data/Sagiri.dat in format: type | marked | name | start | end
      */
     public static void saveTasks(TaskList taskList) {
         try {
@@ -103,16 +107,16 @@ public class Storage {
                 String marked = task.isDone() ? "1" : "0";
                 String name = task.getName();
 
-                String time = "";
+                String start = "null";
+                String end = "null";
                 if (task.getType() == TaskType.EVENT) {
-                    String start = formatDateForStorage(task.getStartDateTime());
-                    String end = formatDateForStorage(task.getEndDateTime());
-                    time = start + " | " + end;
+                    start = formatDateForStorage(task.getStartDateTime());
+                    end = formatDateForStorage(task.getEndDateTime());
                 } else if (task.getType() == TaskType.DEADLINE) {
-                    time = formatDateForStorage(task.getEndDateTime());
+                    end = formatDateForStorage(task.getEndDateTime());
                 }
 
-                fw.write(type + " | " + marked + " | " + name + " | " + time + "\n");
+                fw.write(type + " | " + marked + " | " + name + " | " + start + " | " + end + "\n");
             }
             fw.close();
         } catch (IOException e) {
@@ -123,11 +127,11 @@ public class Storage {
     /**
      * Formats a LocalDateTime to "dd-mm-yy" format for storage.
      * @param dateTime the LocalDateTime to format
-     * @return formatted date string or empty string if dateTime is null
+     * @return formatted date string or "null" if dateTime is null
      */
     private static String formatDateForStorage(LocalDateTime dateTime) {
         if (dateTime == null) {
-            return "";
+            return "null";
         }
         return dateTime.format(DateTimeFormatter.ofPattern("dd-MM-yy"));
     }
