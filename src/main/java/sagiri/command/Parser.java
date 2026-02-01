@@ -1,3 +1,7 @@
+package sagiri.command;
+
+import sagiri.exception.SagiriException;
+
 public class Parser {
 
     /**
