@@ -1,4 +1,5 @@
 package sagiri.ui;
+
 import java.util.ArrayList;
 
 import sagiri.task.Task;
@@ -88,7 +89,7 @@ public class Ui {
                 LocalDateTime startDate = task.getStartDateTime();
                 LocalDateTime endDate = task.getEndDateTime();
                 if ((startDate != null && datesEqual(startDate, targetDate)) ||
-                    (endDate != null && datesEqual(endDate, targetDate))) {
+                        (endDate != null && datesEqual(endDate, targetDate))) {
                     matches = true;
                 }
             } else if (task.getType() == TaskType.DEADLINE) {
@@ -140,6 +141,7 @@ public class Ui {
 
     /**
      * Formats a LocalDateTime for display in the check command.
+     * 
      * @param dateTime the LocalDateTime to format
      * @return formatted date string
      */
@@ -152,6 +154,7 @@ public class Ui {
 
     /**
      * Compares two LocalDateTime objects for date equality (ignores time).
+     * 
      * @param date1 first date
      * @param date2 second date
      * @return true if dates are equal, false otherwise
