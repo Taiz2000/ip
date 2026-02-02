@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import sagiri.exception.SagiriException;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 public class TaskList {
     private ArrayList<Task> tasks;
 
+    /**
+     * Constructor for TaskList.
+     */
     public TaskList() {
         this.tasks = new ArrayList<>();
     }
