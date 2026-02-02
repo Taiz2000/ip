@@ -51,10 +51,16 @@ public class Parser {
         } else if (input.startsWith("deadline ")) {
             String desc = input.substring(9).trim();
             return new ParsedCommand(CommandType.DEADLINE, desc);
+        } else if (input.startsWith("find ")) {
+            String keyword = input.substring(5).trim();
+            if (keyword.isEmpty()) {
+                throw new SagiriException("Please provide a keyword to search for.");
+            }
+            return new ParsedCommand(CommandType.FIND, keyword);
         } else if (input.equals("bye")) {
             return new ParsedCommand(CommandType.BYE);
         } else {
-            String msg = "No clue what that means :((\nYou can use todo, event, deadline, mark, unmark, delete, list, check, or bye";
+            String msg = "No clue what that means :((\nYou can use todo, event, deadline, mark, unmark, delete, list, check, find, or bye";
             throw new SagiriException(msg);
         }
     }
@@ -88,7 +94,7 @@ public class Parser {
     }
 
     public enum CommandType {
-        LIST, MARK, UNMARK, DELETE, TODO, EVENT, DEADLINE, CHECK, BYE
+        LIST, MARK, UNMARK, DELETE, TODO, EVENT, DEADLINE, CHECK, FIND, BYE
     }
 
     public static class ParsedCommand {

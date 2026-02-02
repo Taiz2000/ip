@@ -50,6 +50,9 @@ public class Sagiri {
         case CHECK:
             Ui.printCheckedTasks(taskList.getTasks(), command.data, TaskList.parseDate(command.data));
             break;
+        case FIND:
+            Ui.printFoundTasks(taskList.getTasks(), command.data);
+            break;
         case BYE:
             // Handled in main
             break;

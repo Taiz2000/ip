@@ -112,6 +112,28 @@ public class Ui {
     }
 
     /**
+     * Prints tasks that match the search keyword in their name.
+     */
+    public static void printFoundTasks(ArrayList<Task> tasks, String keyword) {
+        System.out.println(BAR);
+        System.out.println("Tasks matching \"" + keyword + "\":");
+
+        boolean foundTasks = false;
+        for (int i = 0; i < tasks.size(); i++) {
+            Task task = tasks.get(i);
+            if (task.getName().toLowerCase().contains(keyword.toLowerCase())) {
+                System.out.println((i + 1) + "." + task.toString());
+                foundTasks = true;
+            }
+        }
+
+        if (!foundTasks) {
+            System.out.println("No tasks found matching \"" + keyword + "\".");
+        }
+        System.out.println(BAR);
+    }
+
+    /**
      * Prints error message.
      */
     public static void printError(String message) {

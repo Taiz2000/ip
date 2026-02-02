@@ -62,6 +62,13 @@ public class ParserTest {
     }
 
     @Test
+    public void testParseFind() throws SagiriException {
+        Parser.ParsedCommand cmd = Parser.parse("find book");
+        assertEquals(Parser.CommandType.FIND, cmd.type);
+        assertEquals("book", cmd.data);
+    }
+
+    @Test
     public void testParseBye() throws SagiriException {
         Parser.ParsedCommand cmd = Parser.parse("bye");
         assertEquals(Parser.CommandType.BYE, cmd.type);
@@ -80,5 +87,10 @@ public class ParserTest {
     @Test
     public void testParseCheckInvalidDate() {
         assertThrows(SagiriException.class, () -> Parser.parse("check 99-99-99"));
+    }
+
+    @Test
+    public void testParseFindEmptyKeyword() {
+        assertThrows(SagiriException.class, () -> Parser.parse("find"));
     }
 }
