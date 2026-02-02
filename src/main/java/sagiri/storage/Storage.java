@@ -118,6 +118,7 @@ public class Storage {
     /**
      * Saves tasks to disk. Saves to ./data/Sagiri.dat in format: type | marked |
      * name | start | end
+     * If no start and end date, saves as "null".
      */
     public static void saveTasks(TaskList taskList) {
         try {

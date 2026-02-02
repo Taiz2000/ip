@@ -94,6 +94,9 @@ public class Parser {
         }
     }
 
+    /**
+     * Enum of command types.
+     */
     public enum CommandType {
         LIST, MARK, UNMARK, DELETE, TODO, EVENT, DEADLINE, CHECK, FIND, BYE
     }
