@@ -5,17 +5,18 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import sagiri.exception.SagiriException;
-
 import sagiri.task.Task;
 import sagiri.task.TaskList;
 import sagiri.task.TaskType;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-
+/**
+ * Handles loading and saving tasks to disk, ensuring data persistence across sessions.
+ */
 public class Storage {
 
     /**
@@ -36,7 +37,6 @@ public class Storage {
                 if (line.trim().isEmpty()) {
                     continue;
                 }
-                    
 
                 String[] parts = line.split(" \\| ");
                 if (parts.length != 5) {
@@ -150,7 +150,6 @@ public class Storage {
 
     /**
      * Formats a LocalDateTime to "dd-mm-yy" format for storage.
-     * 
      * @param dateTime the LocalDateTime to format
      * @return formatted date string or "null" if dateTime is null
      */

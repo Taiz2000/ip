@@ -1,11 +1,13 @@
 package sagiri.task;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import sagiri.exception.SagiriException;
 
-import java.time.LocalDateTime;
-
+/**
+ * Manages a list of tasks, allowing addition, marking, unmarking, and deletion.
+ */
 public class TaskList {
     private ArrayList<Task> tasks;
 
@@ -129,7 +131,6 @@ public class TaskList {
 
     /**
      * Parses a date string in "dd-mm-yy" format to LocalDateTime.
-     * 
      * @param dateStr the date string to parse
      * @return LocalDateTime object, or null if parsing fails
      */
@@ -155,7 +156,6 @@ public class TaskList {
 
     /**
      * Validates if a date string is in "dd-mm-yy" format.
-     * 
      * @param dateStr the date string to validate
      * @return true if valid, false otherwise
      */

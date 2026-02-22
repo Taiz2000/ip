@@ -2,6 +2,9 @@ package sagiri.command;
 
 import sagiri.exception.SagiriException;
 
+/**
+ * Parses user input into Sagiri
+ */
 public class Parser {
 
     /**
@@ -60,14 +63,16 @@ public class Parser {
         } else if (input.equals("bye")) {
             return new ParsedCommand(CommandType.BYE);
         } else {
-            String msg = "No clue what that means :((\nYou can use todo, event, deadline, mark, unmark, delete, list, check, find, or bye";
+            String msg = """
+                No clue what that means :((
+                You can use todo, event, deadline, mark, unmark, delete, list, check, find, or bye""";
             throw new SagiriException(msg);
         }
     }
 
     /**
      * Validates if a date string is in "dd-mm-yy" format.
-     * 
+     *
      * @param dateStr the date string to validate
      * @return true if valid, false otherwise
      */
@@ -101,23 +106,65 @@ public class Parser {
         LIST, MARK, UNMARK, DELETE, TODO, EVENT, DEADLINE, CHECK, FIND, BYE
     }
 
+    /**
+     * Parsed comment for Sagiri to execute.
+     */
     public static class ParsedCommand {
-        public CommandType type;
-        public String data;
-        public int taskIndex;
+        private CommandType type;
+        private String data;
+        private int taskIndex;
 
+        /**
+         * Constructor for commands without additional data (e.g., list, bye).
+         * @param type
+         */
         public ParsedCommand(CommandType type) {
             this.type = type;
         }
 
+        /**
+         * Constructor for commands with string data
+         * (e.g., todo, event, deadline, check, find).
+         * @param type
+         * @param data
+         */
         public ParsedCommand(CommandType type, String data) {
             this.type = type;
             this.data = data;
         }
 
+        /**
+         * Constructor for commands with task index (e.g., mark, unmark, delete).
+         * @param type
+         * @param taskIndex
+         */
         public ParsedCommand(CommandType type, int taskIndex) {
             this.type = type;
             this.taskIndex = taskIndex;
+        }
+
+        /**
+         * Getter for command type
+         * @return the command type
+         */
+        public CommandType getType() {
+            return type;
+        }
+
+        /**
+         * Getter for command data (if applicable)
+         * @return the command data
+         */
+        public String getData() {
+            return data;
+        }
+
+        /**
+         * Getter for task index (if applicable)
+         * @return the task index
+         */
+        public int getTaskIndex() {
+            return taskIndex;
         }
     }
 }

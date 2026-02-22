@@ -10,9 +10,9 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.input.ScrollEvent;
 import javafx.util.Duration;
 
 /**
@@ -33,6 +33,9 @@ public class MainWindow extends AnchorPane {
     private final Image userImage = loadImageOrPlaceholder("/images/Masamune.jpg");
     private final Image sagiriImage = loadImageOrPlaceholder("/images/Sagiri.jpg");
 
+    /**
+     * Initializes the main window, setting up the scroll pane and dialog container.
+     */
     @FXML
     public void initialize() {
         scrollPane.setFitToWidth(true);
@@ -54,7 +57,7 @@ public class MainWindow extends AnchorPane {
         });
     }
 
-    /** 
+    /**
      * Initial Sagiri message on ui load
      */
     public void setSagiri(Sagiri s) {
