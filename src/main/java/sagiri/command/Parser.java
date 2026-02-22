@@ -12,6 +12,7 @@ public class Parser {
      * Throws SagiriException for invalid inputs.
      */
     public static ParsedCommand parse(String input) throws SagiriException {
+        assert input != null : "Input to parser should not be null";
         if (input.equals("list")) {
             return new ParsedCommand(CommandType.LIST);
         } else if (input.startsWith("mark ")) {

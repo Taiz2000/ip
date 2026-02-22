@@ -61,6 +61,7 @@ public class MainWindow extends AnchorPane {
      * Initial Sagiri message on ui load
      */
     public void setSagiri(Sagiri s) {
+        assert s != null : "Sagiri instance should not be null";
         sagiri = s;
         dialogContainer.getChildren().add(DialogBox.getSagiriDialog(
                 "Hi, my name is Sagiri, how can I help you?",
@@ -74,7 +75,11 @@ public class MainWindow extends AnchorPane {
      */
     @FXML
     private void handleUserInput() {
+        assert sagiri != null : "Sagiri should be set before handling input";
+        assert userInput != null : "userInput should be injected from FXML";
+        assert sendButton != null : "sendButton should be injected from FXML";
         String input = userInput.getText();
+        assert input != null : "TextField should return a non-null input string";
         String response = sagiri.getResponse(input);
         dialogContainer.getChildren().addAll(
                 DialogBox.getUserDialog(input, userImage),
