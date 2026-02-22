@@ -3,6 +3,9 @@ package sagiri.task;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * Represents a task with a name, type, status, and optional start/end dates.
+ */
 public class Task {
     private String name;
     private boolean isDone;
@@ -12,7 +15,6 @@ public class Task {
 
     /**
      * Constructor for Task (ToDo).
-     * 
      * @param name
      */
     public Task(String name) {
@@ -21,7 +23,6 @@ public class Task {
 
     /**
      * Constructor for Task (Event).
-     * 
      * @param name
      * @param startDate
      * @param endDate
@@ -32,7 +33,6 @@ public class Task {
 
     /**
      * Constructor for Task (Deadline).
-     * 
      * @param name
      * @param endDate
      */
@@ -42,7 +42,6 @@ public class Task {
 
     /**
      * Private constructor for Task.
-     * 
      * @param name
      * @param type
      * @param startDate
@@ -58,7 +57,6 @@ public class Task {
 
     /**
      * Parses a date string in "dd-mm-yy" format to LocalDateTime.
-     * 
      * @param dateStr the date string to parse
      * @return LocalDateTime object, or null if parsing fails
      */
@@ -84,7 +82,6 @@ public class Task {
 
     /**
      * Gets the type icon.
-     * 
      * @return "T", "E", or "D"
      */
     public String getTypeIcon() {
@@ -102,7 +99,6 @@ public class Task {
 
     /**
      * Marks the task as done.
-     * 
      * @return "X" or space depending on status
      */
     public String getStatusIcon() {
@@ -111,7 +107,6 @@ public class Task {
 
     /**
      * Gets the name of the task.
-     * 
      * @return name of task
      */
     public String getName() {
@@ -120,7 +115,6 @@ public class Task {
 
     /**
      * Gets the start date of the task.
-     * 
      * @return start date or null
      */
     public String getStartDate() {
@@ -129,7 +123,6 @@ public class Task {
 
     /**
      * Gets the end date of the task.
-     * 
      * @return end date or null
      */
     public String getEndDate() {
@@ -138,7 +131,6 @@ public class Task {
 
     /**
      * Gets the start date as LocalDateTime.
-     * 
      * @return start date or null
      */
     public LocalDateTime getStartDateTime() {
@@ -147,7 +139,6 @@ public class Task {
 
     /**
      * Gets the end date as LocalDateTime.
-     * 
      * @return end date or null
      */
     public LocalDateTime getEndDateTime() {
@@ -156,7 +147,6 @@ public class Task {
 
     /**
      * Formats a LocalDateTime to "dd MMM yyyy" format.
-     * 
      * @param dateTime the LocalDateTime to format
      * @return formatted date string or null if dateTime is null
      */
@@ -169,7 +159,6 @@ public class Task {
 
     /**
      * Checks if the task is done.
-     * 
      * @return true if done, false otherwise
      */
     public boolean isDone() {
@@ -178,7 +167,6 @@ public class Task {
 
     /**
      * Gets the task type.
-     * 
      * @return the task type
      */
     public TaskType getType() {

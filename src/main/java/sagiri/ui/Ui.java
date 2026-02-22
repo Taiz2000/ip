@@ -1,13 +1,15 @@
 package sagiri.ui;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 import sagiri.task.Task;
 import sagiri.task.TaskType;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-
+/**
+ * Handles all user interface interactions, including displaying messages and formatting output.
+ */
 public class Ui {
     private static final String BAR = "____________________________________________________________";
 
@@ -88,8 +90,8 @@ public class Ui {
                 // Check if event starts or ends on the target date
                 LocalDateTime startDate = task.getStartDateTime();
                 LocalDateTime endDate = task.getEndDateTime();
-                if ((startDate != null && datesEqual(startDate, targetDate)) ||
-                        (endDate != null && datesEqual(endDate, targetDate))) {
+                if ((startDate != null && datesEqual(startDate, targetDate))
+                        || (endDate != null && datesEqual(endDate, targetDate))) {
                     matches = true;
                 }
             } else if (task.getType() == TaskType.DEADLINE) {
@@ -163,7 +165,6 @@ public class Ui {
 
     /**
      * Formats a LocalDateTime for display in the check command.
-     * 
      * @param dateTime the LocalDateTime to format
      * @return formatted date string
      */
@@ -176,7 +177,6 @@ public class Ui {
 
     /**
      * Compares two LocalDateTime objects for date equality (ignores time).
-     * 
      * @param date1 first date
      * @param date2 second date
      * @return true if dates are equal, false otherwise

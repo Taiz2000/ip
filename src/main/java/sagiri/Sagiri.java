@@ -17,6 +17,10 @@ import sagiri.task.TaskType;
 public class Sagiri {
     private final TaskList taskList;
 
+    /**
+     * Constructor for Sagiri, initializes the task list and loads tasks from storage.
+     * If loading fails, it continues with an empty task list.
+     */
     public Sagiri() {
         taskList = new TaskList();
         try {
@@ -39,40 +43,40 @@ public class Sagiri {
     }
 
     private String processCommand(Parser.ParsedCommand command) throws SagiriException {
-        switch (command.type) {
+        switch (command.getType()) {
         case LIST:
             return formatTaskList(taskList.getTasks());
         case MARK:
-            taskList.markTaskDone(command.taskIndex);
+            taskList.markTaskDone(command.getTaskIndex());
             Storage.saveTasks(taskList);
-            return "Nice! I've marked this task as done:\n" + taskList.getTasks().get(command.taskIndex);
+            return "Nice! I've marked this task as done:\n" + taskList.getTasks().get(command.getTaskIndex());
         case UNMARK:
-            taskList.markTaskNotDone(command.taskIndex);
+            taskList.markTaskNotDone(command.getTaskIndex());
             Storage.saveTasks(taskList);
-            return "OK, I've marked this task as not done yet:\n" + taskList.getTasks().get(command.taskIndex);
+            return "OK, I've marked this task as not done yet:\n" + taskList.getTasks().get(command.getTaskIndex());
         case DELETE:
-            Task removed = taskList.deleteTask(command.taskIndex);
+            Task removed = taskList.deleteTask(command.getTaskIndex());
             Storage.saveTasks(taskList);
             return "Noted. I've removed this task:\n" + removed;
         case TODO:
-            Task addedTodo = taskList.addTodo(command.data);
+            Task addedTodo = taskList.addTodo(command.getData());
             Storage.saveTasks(taskList);
             return "Got it. I've added this task:\n" + addedTodo + "\nNow you have " + taskList.size()
                     + " tasks in the list.";
         case EVENT:
-            Task addedEvent = taskList.addEvent(command.data);
+            Task addedEvent = taskList.addEvent(command.getData());
             Storage.saveTasks(taskList);
             return "Got it. I've added this task:\n" + addedEvent + "\nNow you have " + taskList.size()
                     + " tasks in the list.";
         case DEADLINE:
-            Task addedDeadline = taskList.addDeadline(command.data);
+            Task addedDeadline = taskList.addDeadline(command.getData());
             Storage.saveTasks(taskList);
             return "Got it. I've added this task:\n" + addedDeadline + "\nNow you have " + taskList.size()
                     + " tasks in the list.";
         case CHECK:
-            return formatCheckedTasks(taskList.getTasks(), command.data, TaskList.parseDate(command.data));
+            return formatCheckedTasks(taskList.getTasks(), command.getData(), TaskList.parseDate(command.getData()));
         case FIND:
-            return formatFoundTasks(taskList.getTasks(), command.data);
+            return formatFoundTasks(taskList.getTasks(), command.getData());
         case BYE:
             return "Bye. Hope to see you again soon!";
         default:
