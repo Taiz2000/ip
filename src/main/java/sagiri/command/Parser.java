@@ -1,6 +1,7 @@
 package sagiri.command;
 
 import sagiri.exception.SagiriException;
+import sagiri.util.DateTimeUtil;
 
 /**
  * Parses user input into Sagiri
@@ -38,7 +39,7 @@ public class Parser {
         } else if (input.startsWith("check ")) {
             try {
                 String dateStr = input.substring(6).trim();
-                if (!isValidDateFormat(dateStr)) {
+                if (!DateTimeUtil.isValidDateFormat(dateStr)) {
                     throw new SagiriException("Invalid date format. Please use dd-mm-yy format (e.g., 25-12-24)");
                 }
                 return new ParsedCommand(CommandType.CHECK, dateStr);
@@ -67,35 +68,6 @@ public class Parser {
                 No clue what that means :((
                 You can use todo, event, deadline, mark, unmark, delete, list, check, find, or bye""";
             throw new SagiriException(msg);
-        }
-    }
-
-    /**
-     * Validates if a date string is in "dd-mm-yy" format.
-     *
-     * @param dateStr the date string to validate
-     * @return true if valid, false otherwise
-     */
-    private static boolean isValidDateFormat(String dateStr) {
-        if (dateStr == null || dateStr.length() != 8) {
-            return false;
-        }
-        try {
-            String[] parts = dateStr.split("-");
-            if (parts.length != 3) {
-                return false;
-            }
-            int day = Integer.parseInt(parts[0]);
-            int month = Integer.parseInt(parts[1]);
-            int year = Integer.parseInt(parts[2]);
-
-            // Basic validation
-            if (day < 1 || day > 31 || month < 1 || month > 12 || year < 0 || year > 99) {
-                return false;
-            }
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
         }
     }
 

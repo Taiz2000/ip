@@ -96,6 +96,11 @@ public class ParserTest {
     }
 
     @Test
+    public void testParseCheckInvalidCalendarDate() {
+        assertThrows(SagiriException.class, () -> Parser.parse("check 31-02-24"));
+    }
+
+    @Test
     public void testParseFindEmptyKeyword() {
         assertThrows(SagiriException.class, () -> Parser.parse("find"));
     }
