@@ -1,6 +1,8 @@
 package sagiri;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
@@ -29,6 +31,7 @@ public class MainWindow extends AnchorPane {
     private Button sendButton;
 
     private Sagiri sagiri;
+    private final List<String> missingResources = new ArrayList<>();
 
     private final Image userImage = loadImageOrPlaceholder("/images/Masamune.jpg");
     private final Image sagiriImage = loadImageOrPlaceholder("/images/Sagiri.jpg");
@@ -65,6 +68,12 @@ public class MainWindow extends AnchorPane {
         dialogContainer.getChildren().add(DialogBox.getSagiriDialog(
                 "Hi, my name is Sagiri, how can I help you?",
                 sagiriImage));
+
+        if (!missingResources.isEmpty()) {
+            dialogContainer.getChildren().add(DialogBox.getSagiriDialog(
+                    buildMissingResourcesWarning(),
+                    sagiriImage));
+        }
     }
 
     /**
@@ -94,8 +103,14 @@ public class MainWindow extends AnchorPane {
     private Image loadImageOrPlaceholder(String resourcePath) {
         InputStream stream = this.getClass().getResourceAsStream(resourcePath);
         if (stream == null) {
+            missingResources.add(resourcePath);
             return new WritableImage(100, 100);
         }
         return new Image(stream);
+    }
+
+    private String buildMissingResourcesWarning() {
+        String resourceList = String.join(", ", missingResources);
+        return "Warning: Some UI resources are missing; placeholders are being used: " + resourceList;
     }
 }
