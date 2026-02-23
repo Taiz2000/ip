@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import sagiri.exception.SagiriException;
+import sagiri.util.DateTimeUtil;
 
 /**
  * Manages a list of tasks, allowing addition, marking, unmarking, and deletion.
@@ -135,23 +136,7 @@ public class TaskList {
      * @return LocalDateTime object, or null if parsing fails
      */
     public static LocalDateTime parseDate(String dateStr) {
-        if (dateStr == null || dateStr.trim().isEmpty()) {
-            return null;
-        }
-        try {
-            // Parse dd-mm-yy format
-            String[] parts = dateStr.split("-");
-            if (parts.length != 3) {
-                return null;
-            }
-            int day = Integer.parseInt(parts[0]);
-            int month = Integer.parseInt(parts[1]);
-            int year = Integer.parseInt(parts[2]) + 2000; // yy -> 20yy
-
-            return LocalDateTime.of(year, month, day, 0, 0);
-        } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
-            return null;
-        }
+        return DateTimeUtil.parseDate(dateStr);
     }
 
     /**
@@ -160,25 +145,6 @@ public class TaskList {
      * @return true if valid, false otherwise
      */
     public static boolean isValidDateFormat(String dateStr) {
-        if (dateStr == null || dateStr.length() != 8) {
-            return false;
-        }
-        try {
-            String[] parts = dateStr.split("-");
-            if (parts.length != 3) {
-                return false;
-            }
-            int day = Integer.parseInt(parts[0]);
-            int month = Integer.parseInt(parts[1]);
-            int year = Integer.parseInt(parts[2]);
-
-            // Basic validation
-            if (day < 1 || day > 31 || month < 1 || month > 12 || year < 0 || year > 99) {
-                return false;
-            }
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
+        return DateTimeUtil.isValidDateFormat(dateStr);
     }
 }
