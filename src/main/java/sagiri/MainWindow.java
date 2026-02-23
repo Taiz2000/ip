@@ -67,7 +67,7 @@ public class MainWindow extends AnchorPane {
         assert s != null : "Sagiri instance should not be null";
         sagiri = s;
         dialogContainer.getChildren().add(DialogBox.getSagiriDialog(
-                "Hi, my name is Sagiri, how can I help you?",
+                "Hi, my name is Sagiri, how can I help you?\nType 'help' to see what I can do!",
                 sagiriImage));
 
         if (!missingResources.isEmpty()) {
