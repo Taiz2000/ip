@@ -62,12 +62,14 @@ public class Parser {
                 throw new SagiriException("Please provide a keyword to search for.");
             }
             return new ParsedCommand(CommandType.FIND, keyword);
+        } else if (input.equals("help")) {
+            return new ParsedCommand(CommandType.HELP);
         } else if (input.equals("bye")) {
             return new ParsedCommand(CommandType.BYE);
         } else {
             String msg = """
                 No clue what that means :((
-                You can use todo, event, deadline, mark, unmark, delete, list, check, find, or bye""";
+                You can use todo, event, deadline, mark, unmark, delete, list, check, find, help, or bye""";
             throw new SagiriException(msg);
         }
     }
@@ -76,7 +78,7 @@ public class Parser {
      * Enum of command types.
      */
     public enum CommandType {
-        LIST, MARK, UNMARK, DELETE, TODO, EVENT, DEADLINE, CHECK, FIND, BYE
+        LIST, MARK, UNMARK, DELETE, TODO, EVENT, DEADLINE, CHECK, FIND, HELP, BYE
     }
 
     /**

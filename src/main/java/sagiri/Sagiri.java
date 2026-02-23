@@ -15,6 +15,21 @@ import sagiri.task.TaskType;
  * Core chatbot logic used by the GUI.
  */
 public class Sagiri {
+    private static final String HELP_MENU = """
+            Here are the commands you can use:
+            list
+            todo <description>
+            deadline <description> /by <dd-mm-yy>
+            event <description> /from <dd-mm-yy> /to <dd-mm-yy>
+            mark <task number>
+            unmark <task number>
+            delete <task number>
+            check <dd-mm-yy>
+            find <keyword>
+            help
+            bye
+            """;
+
     private final TaskList taskList;
 
     /**
@@ -87,6 +102,8 @@ public class Sagiri {
         case FIND:
             assert command.getData() != null : "FIND command expects search keyword";
             return formatFoundTasks(taskList.getTasks(), command.getData());
+        case HELP:
+            return HELP_MENU;
         case BYE:
             return "Bye. Hope to see you again soon!";
         default:
