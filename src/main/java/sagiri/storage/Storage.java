@@ -108,6 +108,8 @@ public class Storage {
                         task.markAsDone();
                     }
                     taskList.getTasks().add(task); // Directly add to the list
+                    assert taskList.getTasks().get(taskList.getTasks().size() - 1) != null
+                            : "Loaded task should not be null";
                 }
             }
         } catch (IOException e) {
@@ -136,8 +138,11 @@ public class Storage {
                 if (task.getType() == TaskType.EVENT) {
                     start = formatDateForStorage(task.getStartDateTime());
                     end = formatDateForStorage(task.getEndDateTime());
+                    assert !"null".equals(start) && !"null".equals(end)
+                            : "Event tasks must have start and end dates when saving";
                 } else if (task.getType() == TaskType.DEADLINE) {
                     end = formatDateForStorage(task.getEndDateTime());
+                    assert !"null".equals(end) : "Deadline tasks must have end date when saving";
                 }
 
                 fw.write(type + " | " + marked + " | " + name + " | " + start + " | " + end + "\n");

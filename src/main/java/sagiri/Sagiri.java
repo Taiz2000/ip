@@ -43,39 +43,49 @@ public class Sagiri {
     }
 
     private String processCommand(Parser.ParsedCommand command) throws SagiriException {
+        assert command != null : "Parsed command should not be null";
+        assert taskList != null : "TaskList should be initialized";
         switch (command.getType()) {
         case LIST:
             return formatTaskList(taskList.getTasks());
         case MARK:
+            assert command.getTaskIndex() >= 0 : "MARK command expects non-negative task index";
             taskList.markTaskDone(command.getTaskIndex());
             Storage.saveTasks(taskList);
             return "Nice! I've marked this task as done:\n" + taskList.getTasks().get(command.getTaskIndex());
         case UNMARK:
+            assert command.getTaskIndex() >= 0 : "UNMARK command expects non-negative task index";
             taskList.markTaskNotDone(command.getTaskIndex());
             Storage.saveTasks(taskList);
             return "OK, I've marked this task as not done yet:\n" + taskList.getTasks().get(command.getTaskIndex());
         case DELETE:
+            assert command.getTaskIndex() >= 0 : "DELETE command expects non-negative task index";
             Task removed = taskList.deleteTask(command.getTaskIndex());
             Storage.saveTasks(taskList);
             return "Noted. I've removed this task:\n" + removed;
         case TODO:
+            assert command.getData() != null : "TODO command expects task description";
             Task addedTodo = taskList.addTodo(command.getData());
             Storage.saveTasks(taskList);
             return "Got it. I've added this task:\n" + addedTodo + "\nNow you have " + taskList.size()
                     + " tasks in the list.";
         case EVENT:
+            assert command.getData() != null : "EVENT command expects task description";
             Task addedEvent = taskList.addEvent(command.getData());
             Storage.saveTasks(taskList);
             return "Got it. I've added this task:\n" + addedEvent + "\nNow you have " + taskList.size()
                     + " tasks in the list.";
         case DEADLINE:
+            assert command.getData() != null : "DEADLINE command expects task description";
             Task addedDeadline = taskList.addDeadline(command.getData());
             Storage.saveTasks(taskList);
             return "Got it. I've added this task:\n" + addedDeadline + "\nNow you have " + taskList.size()
                     + " tasks in the list.";
         case CHECK:
+            assert command.getData() != null : "CHECK command expects date string";
             return formatCheckedTasks(taskList.getTasks(), command.getData(), TaskList.parseDate(command.getData()));
         case FIND:
+            assert command.getData() != null : "FIND command expects search keyword";
             return formatFoundTasks(taskList.getTasks(), command.getData());
         case BYE:
             return "Bye. Hope to see you again soon!";
