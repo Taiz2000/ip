@@ -26,7 +26,7 @@ public class Main extends Application {
             fxmlLoader.<MainWindow>getController().setSagiri(sagiri);
             stage.show();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new IllegalStateException("Failed to start Sagiri UI", e);
         }
     }
 }
